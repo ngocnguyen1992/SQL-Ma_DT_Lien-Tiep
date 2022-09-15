@@ -1,6 +1,7 @@
 -- Cách 1 dùng While và trả về ngày đầu tháng 
 
 IF OBJECT_ID('tempdb..#temp') IS NOT NULL DROP TABLE #temp
+
 SELECT (ROW_NUMBER () OVER ( ORDER BY Ma_DT, Ngay_Ct ASC)) AS Stt, Ngay_Ct, Ma_DT 
 INTO #temp 
 FROM dbo.BanHang 
@@ -29,6 +30,7 @@ BEGIN
 END
 SELECT * FROM #temp WHERE check_ = 1
 SELECT * FROM #temp ORDER BY Ma_DT, Ngay_Ct
+
 IF OBJECT_ID('tempdb..#temp') IS NOT NULL DROP TABLE #temp
 
 -- Cách 2 dùng LAG
@@ -53,6 +55,7 @@ FROM #temp
 ORDER BY Ma_DT
 
 IF OBJECT_ID('tempdb..#t3') IS NOT NULL DROP TABLE #t3
+
 SELECT Ma_Dt, Ngay_DauThang, _LAG, _MONTH, ROW_NUMBER() OVER(PARTITION BY Ma_DT, _MONTH ORDER BY Ngay_DauThang) AS sale
 INTO #t3
 FROM #t2
