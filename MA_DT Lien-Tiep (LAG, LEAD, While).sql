@@ -40,7 +40,6 @@ IF OBJECT_ID('tempdb..#temp') IS NOT NULL DROP TABLE #temp
 SELECT (ROW_NUMBER () OVER ( ORDER BY Ma_DT, Ngay_Ct ASC)) AS Stt, Ngay_Ct, Ma_DT 
 INTO #temp 
 FROM dbo.BanHang 
-GROUP BY Ngay_Ct, Ma_DT
 
 ALTER TABLE #temp ADD Ngay_DauThang DATE
 ALTER TABLE #temp ADD check_ varchar(8)
