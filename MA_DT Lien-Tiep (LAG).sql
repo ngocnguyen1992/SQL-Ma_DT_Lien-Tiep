@@ -31,3 +31,27 @@ SELECT * FROM #t3 WHERE _MONTH = 1 AND sale <= 3
 IF OBJECT_ID('tempdb..#temp') IS NOT NULL DROP TABLE #temp
 IF OBJECT_ID('tempdb..#t2') IS NOT NULL DROP TABLE #t2
 IF OBJECT_ID('tempdb..#t3') IS NOT NULL DROP TABLE #t3
+
+
+-- cách 2 tối ưu
+
+IF OBJECT_ID('tempdb..#temp') IS NOT NULL DROP TABLE #temp
+
+SELECT Ma_DT, LAG(Ngay_Ct,1) OVER(PARTITION BY Ma_DT ORDER BY Ngay_Ct) AS _LAG, Ngay_Ct,
+DATEDIFF(M, LAG(Ngay_Ct,1) OVER(PARTITION BY Ma_DT ORDER BY Ngay_Ct), Ngay_Ct) AS _MONTH
+INTO #temp
+FROM (SELECT Ma_DT, DATEADD(DAY,-DAY(Ngay_Ct)+1,Ngay_Ct) AS Ngay_Ct FROM dbo.BanHang
+WHERE Ngay_Ct BETWEEN '20140101' AND '20141231'
+GROUP BY Ma_DT, Ngay_Ct) tbl
+ORDER BY Ma_DT
+
+IF OBJECT_ID('tempdb..#temp2') IS NOT NULL DROP TABLE #temp2
+SELECT Ma_Dt, Ngay_Ct, _LAG, _MONTH, ROW_NUMBER() OVER(PARTITION BY Ma_DT, _MONTH ORDER BY Ngay_Ct) AS sale
+INTO #temp2
+FROM #temp
+ORDER BY Ma_DT
+
+SELECT * FROM #temp2 WHERE _MONTH = 1 AND sale <=3
+
+IF OBJECT_ID('tempdb..#temp') IS NOT NULL DROP TABLE #temp
+IF OBJECT_ID('tempdb..#temp2') IS NOT NULL DROP TABLE #temp2
